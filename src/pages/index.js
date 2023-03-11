@@ -210,25 +210,7 @@ const Home = () => {
                 >
                   Send OTP
                 </button>
-                <div className="w-full flex space-x-2 items-center justify-between my-5">
-                  <div className="w-5/12 h-px bg-white"></div>
-                  <div className="w-2/12  text-center">or</div>
-                  <div className="w-5/12 h-px bg-white"></div>
-                </div>
-                <div className="w-full flex justify-center space-x-5">
-                  <div
-                    onClick={() => googleLoginHandler()}
-                    className="cursor-pointer px-8 py-4 border border-white rounded-xl "
-                  >
-                    <img src="/images/google.svg" />
-                  </div>
-                  <div
-                    onClick={() => fbLoginHandler()}
-                    className="cursor-pointer px-8 py-4 border border-white rounded-xl "
-                  >
-                    <img src="/images/fb.svg" />
-                  </div>
-                </div>
+               
                 <div className="w-full text-xs text-gray-400 justify-center mt-2 flex space-x-1">
                   <div>Don't have an account ?</div>
                   <div

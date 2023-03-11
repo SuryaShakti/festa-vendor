@@ -8,6 +8,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/outline";
 import axios from "axios";
+import { useRouter } from "next/router";
 import React, { Fragment, useEffect, useState } from "react";
 import ImageUploading from "react-images-uploading";
 
@@ -45,6 +46,8 @@ const Onboarding = () => {
   const [instagram, setInstagram] = useState("");
   const [facebook, setFacebook] = useState("");
   const [description, setDescription] = useState("");
+
+  const router = useRouter();
 
   const getCategories = async () => {
     var config = {
@@ -242,6 +245,8 @@ const Onboarding = () => {
   };
 
   const saveHandler = async () => {
+    const token = localStorage.getItem("token");
+
     console.log({
       brand: brandName,
       description: description,
@@ -263,6 +268,48 @@ const Onboarding = () => {
         instagram: instagram,
       },
     });
+
+    var data = JSON.stringify({
+      brand: brandName,
+      description: description,
+      address: {
+        addressLine1: comAddress,
+      },
+      coordinates: [25.8014, 85.478],
+      businessProof: businessProofUrl,
+      attachments: attachmentsUrl,
+      packages: packagesLinks,
+      categories: [
+        {
+          category: selectedCat._id,
+          subCategories: [selectedSubCat._id],
+        },
+      ],
+      socialLinks: {
+        facebook: facebook,
+        instagram: instagram,
+      },
+    });
+
+    var config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://api.test.festabash.com/v1/vendor-management/vendor",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      data: data,
+    };
+
+    await axios(config)
+      .then(function (response) {
+        console.log(response.data);
+        router.push("/dashboard");
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   useEffect(() => {
@@ -350,122 +397,124 @@ const Onboarding = () => {
                 placeholder={"Enter your brand name"}
               />
             </div>
-            <div className="my-2">
-              <div className="text-white text-sm ">
-                Category <span className=" text-sm">*</span>
-              </div>
-              <Menu
-                as="div"
-                className="relative  w-full inline-block text-left mt-2"
-              >
-                <div>
-                  <Menu.Button className="z-50 inline-flex text-white hover:bg-gray-200 w-full justify-between rounded-md px-4 py-2 text-sm  border border-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-opacity-75">
-                    {selectedCat?.title
-                      ? categories.filter(
-                          (cat) => cat._id === selectedCat._id
-                        )[0]?.title
-                      : "select"}
-                    <ChevronDownIcon
-                      className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
-                      aria-hidden="true"
-                    />
-                  </Menu.Button>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="my-2">
+                <div className="text-white text-sm ">
+                  Category <span className=" text-sm">*</span>
                 </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
+                <Menu
+                  as="div"
+                  className="relative  w-full inline-block text-left mt-2"
                 >
-                  <Menu.Items className="absolute  mt-2 w-max px- origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="px-1 py-1 ">
-                      {categories?.map((cat, index) => (
-                        <Menu.Item
-                          key={index}
-                          onClick={() => {
-                            setSelectedCat(cat);
-                            setSelectedSubCat({});
-                          }}
-                        >
-                          {({ active }) => (
-                            <button
-                              className={`${
-                                active
-                                  ? "bg-violet-500 text-white"
-                                  : "text-gray-900"
-                              } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                            >
-                              {cat.title}
-                            </button>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
-            </div>
-            <div className="mb-2">
-              <div className="text-white text-sm ">
-                Sub Category <span className=" text-sm">*</span>
-              </div>
-              <Menu
-                as="div"
-                className="relative w-full inline-block text-left mt-2"
-              >
-                <div>
-                  <Menu.Button className="z-50 inline-flex text-white hover:bg-gray-200 w-full justify-between rounded-md px-4 py-2 text-sm  border border-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-opacity-75">
-                    {selectedSubCat?.title
-                      ? categories
-                          .filter((cat) => cat._id === selectedCat._id)[0]
-                          ?.subCatgories.filter(
-                            (cat) => cat._id === selectedSubCat._id
+                  <div>
+                    <Menu.Button className="z-50 inline-flex text-white hover:bg-gray-200 w-full justify-between rounded-md px-4 py-2 text-sm  border border-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-opacity-75">
+                      {selectedCat?.title
+                        ? categories.filter(
+                            (cat) => cat._id === selectedCat._id
                           )[0]?.title
-                      : "Select"}
-                    <ChevronDownIcon
-                      className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
-                      aria-hidden="true"
-                    />
-                  </Menu.Button>
+                        : "select"}
+                      <ChevronDownIcon
+                        className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
+                        aria-hidden="true"
+                      />
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute mt-2 w-full origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="px-1 py-1 ">
+                        {categories?.map((cat, index) => (
+                          <Menu.Item
+                            key={index}
+                            onClick={() => {
+                              setSelectedCat(cat);
+                              setSelectedSubCat({});
+                            }}
+                          >
+                            {({ active }) => (
+                              <button
+                                className={`${
+                                  active
+                                    ? "bg-violet-500 text-white"
+                                    : "text-gray-900"
+                                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                              >
+                                {cat.title}
+                              </button>
+                            )}
+                          </Menu.Item>
+                        ))}
+                      </div>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
+              </div>
+              <div className="my-2">
+                <div className="text-white text-sm ">
+                  Sub Category <span className=" text-sm">*</span>
                 </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
+                <Menu
+                  as="div"
+                  className="relative w-full inline-block text-left mt-2"
                 >
-                  <Menu.Items className="absolute  mt-2 w-max px- origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="px-1 py-1 ">
-                      {selectedCat?.subCatgories?.map((cat, index) => (
-                        <Menu.Item
-                          key={index}
-                          onClick={() => {
-                            setSelectedSubCat(cat);
-                          }}
-                        >
-                          {({ active }) => (
-                            <button
-                              className={`${
-                                active
-                                  ? "bg-violet-500 text-white"
-                                  : "text-gray-900"
-                              } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                            >
-                              {cat.title}
-                            </button>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
+                  <div>
+                    <Menu.Button className="z-50 inline-flex text-white hover:bg-gray-200 w-full justify-between rounded-md px-4 py-2 text-sm  border border-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-opacity-75">
+                      {selectedSubCat?.title
+                        ? categories
+                            .filter((cat) => cat._id === selectedCat._id)[0]
+                            ?.subCatgories.filter(
+                              (cat) => cat._id === selectedSubCat._id
+                            )[0]?.title
+                        : "Select"}
+                      <ChevronDownIcon
+                        className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
+                        aria-hidden="true"
+                      />
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute  mt-2 w-full px- origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="px-1 py-1 ">
+                        {selectedCat?.subCatgories?.map((cat, index) => (
+                          <Menu.Item
+                            key={index}
+                            onClick={() => {
+                              setSelectedSubCat(cat);
+                            }}
+                          >
+                            {({ active }) => (
+                              <button
+                                className={`${
+                                  active
+                                    ? "bg-violet-500 text-white"
+                                    : "text-gray-900"
+                                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                              >
+                                {cat.title}
+                              </button>
+                            )}
+                          </Menu.Item>
+                        ))}
+                      </div>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
+              </div>
             </div>
 
             <div className="m">
@@ -511,7 +560,7 @@ const Onboarding = () => {
               <div>
                 <div className="text-white text-sm mt-5 mb-1">
                   Identity Proof <span className=" text-sm">*</span>
-                  <div className="grid grid-cols-2 gap-2 mt-1">
+                  <div className="grid grid-cols-3 gap-2 mt-1">
                     <ImageUploading
                       multiple
                       value={photo}
@@ -531,11 +580,11 @@ const Onboarding = () => {
                         <div className="flex space-x-2">
                           {!photoUrl && (
                             <button
-                              className="w-full h-10 rounded-xl bg-gray-100 bg-opacity-20 border flex justify-center items-center text-3xl font-black text-gray-50"
+                              className="w-full h-10 rounded-lg bg-gray-100 bg-opacity-20 border flex justify-between px-2 items-center text-gray-50"
                               onClick={onImageUpload}
                               {...dragProps}
                             >
-                              <DocumentAddIcon className="h-7" />
+                              Upload here <DocumentAddIcon className="h-7" />
                             </button>
                           )}
                           {photoUploading && (
@@ -563,13 +612,17 @@ const Onboarding = () => {
                     </ImageUploading>
                     <select
                       id="countries"
-                      className="bg-gray-100 h-10 bg-opacity-20 border border-gray-300 text-white text-sm rounded-lg"
+                      onChange={(e) => {
+                        console.log(e.target.value);
+                        
+                      }}
+                      className="bg-gray-100 h-10 bg-opacity-20 border px-2 border-gray-300 text-white text-sm rounded-lg"
                     >
                       <option className="text-gray-400" selected>
                         Select
                       </option>
-                      <option className="text-gray-400" value="adhar">
-                        Adhar Card
+                      <option className="text-gray-400" value="aadhar">
+                        Aadhar Card
                       </option>
                       <option className="text-gray-400" value="pan">
                         PAN card
@@ -585,7 +638,7 @@ const Onboarding = () => {
                 </div>
                 <div className="text-white text-sm mt-5 mb-1">
                   Business Proof <span className=" text-sm">*</span>
-                  <div className="grid grid-cols-2 gap-2 mt-1">
+                  <div className="grid grid-cols-3 gap-2 mt-1">
                     <ImageUploading
                       multiple
                       value={businessProof}
@@ -605,11 +658,11 @@ const Onboarding = () => {
                         <div className="flex space-x-2">
                           {!businessProofUrl && (
                             <button
-                              className="w-full h-10 rounded-xl bg-gray-100 bg-opacity-20 border flex justify-center items-center text-3xl font-black text-gray-50"
+                              className="w-full h-10 rounded-lg bg-gray-100 bg-opacity-20 border flex justify-between px-2 items-center text-gray-50"
                               onClick={onImageUpload}
                               {...dragProps}
                             >
-                              <DocumentAddIcon className="h-7" />
+                              Upload here <DocumentAddIcon className="h-7" />
                             </button>
                           )}
                           {businessProofUploading && (
@@ -637,7 +690,7 @@ const Onboarding = () => {
                     </ImageUploading>
                     <select
                       id="countries"
-                      className="bg-gray-100 h-10 bg-opacity-20 border border-gray-300 text-white text-sm rounded-lg"
+                      className="bg-gray-100 h-10 bg-opacity-20 border px-2 border-gray-300 text-white text-sm rounded-lg"
                     >
                       <option className="text-gray-400" selected>
                         Select
@@ -659,6 +712,19 @@ const Onboarding = () => {
                       </option>
                     </select>
                   </div>
+                </div>
+
+                <div className="mt-5">
+                  <div className="text-white text-sm  mb-1">
+                    Descritpion <span className=" text-sm">*</span>
+                  </div>
+                  <textarea
+                    className="w-full py-2 border rounded-lg px-4 border-white bg-transparent"
+                    value={description}
+                    rows={4}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder={"Please describe your service"}
+                  />
                 </div>
 
                 <div className="w-full flex justify-end mt-8">
