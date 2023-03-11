@@ -82,8 +82,10 @@ export default function DefaultLayout({ children }) {
   }
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    setUser(user);
+    if (localStorage.getItem("user")) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      setUser(user);
+    }
     getLocation();
   }, []);
 

@@ -106,9 +106,9 @@ const Home = () => {
             .then(function (response) {
               console.log(response.data);
               localStorage.setItem("token", response.data.accessToken);
-              localStorage.setItem("user", response.data.user);
+              localStorage.setItem("user", JSON.stringify(response.data.user));
               setError({ field: "", message: "" });
-              router.push("/dashboard");
+              router.push("/onboarding");
             })
             .catch(function (error) {
               console.log(error);

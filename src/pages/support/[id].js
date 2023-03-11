@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect,   } from "react";
 import Spinner from "../../components/Spinner";
 
 const SupportDetails = () => {
