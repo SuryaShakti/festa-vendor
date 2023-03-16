@@ -334,12 +334,12 @@ const Onboarding = () => {
       coordinates: [25.8014, 85.478],
       businessProof: [
         {
-          type: "Vote Id card",
-          link: "https://festa-event-dev.s3.ap-south-1.amazonaws.com/photos/1678724067087_image_picker2495915530613188681.jpg",
+          type: identityType,
+          link: photoUrl,
         },
         {
-          type: "Sales Tax certificate",
-          link: "https://festa-event-dev.s3.ap-south-1.amazonaws.com/photos/1678724067237_0c9ee23e-4ae5-40a3-a5d2-44288e4fe82f8065014382952304833.jpg",
+          type: businessProofType,
+          link: businessProofUrl,
         },
       ],
       attachments: attachmentsUrl,
@@ -935,7 +935,7 @@ const Onboarding = () => {
                 onClick={() => saveHandler()}
                 className="px-10 rounded-xl py-2 bg-indigo-600 hover:bg-indigo-400 text-white"
               >
-                Next
+                Save and continue
               </button>
             </div>{" "}
           </div>
