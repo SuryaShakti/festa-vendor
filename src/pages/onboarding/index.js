@@ -49,6 +49,7 @@ const Onboarding = () => {
   const [description, setDescription] = useState("");
   const [businessProofType, setBusinessProofType] = useState("");
   const [identityType, setIdentityType] = useState("");
+  const [saveLoading, setSaveLoading] = useState(false);
 
   const router = useRouter();
 
@@ -325,6 +326,8 @@ const Onboarding = () => {
       },
     });
 
+    setSaveLoading(true);
+
     var data = JSON.stringify({
       brand: brandName,
       description: description,
@@ -375,11 +378,13 @@ const Onboarding = () => {
           ...user1,
           vendor: response.data._id,
         };
-        localStorage.setItem("user", _user);
+        localStorage.setItem("user", JSON.stringify(_user));
         router.push("/dashboard");
+        setSaveLoading(false);
       })
       .catch(function (error) {
         console.log(error);
+        setSaveLoading(false);
       });
   };
 
@@ -672,7 +677,12 @@ const Onboarding = () => {
                                   <button onClick={() => onImageUpdate(index)}>
                                     <PencilAltIcon className="w-6 text-gray-500" />
                                   </button>
-                                  <button onClick={() => setPhoto("")}>
+                                  <button
+                                    onClick={() => {
+                                      setPhoto("");
+                                      setPhotoUrl("");
+                                    }}
+                                  >
                                     <TrashIcon className="w-6 text-red-500" />
                                   </button>
                                 </div>
@@ -750,7 +760,12 @@ const Onboarding = () => {
                                   <button onClick={() => onImageUpdate(index)}>
                                     <PencilAltIcon className="w-6 text-gray-500" />
                                   </button>
-                                  <button onClick={() => setBusinessProof("")}>
+                                  <button
+                                    onClick={() => {
+                                      setBusinessProof("");
+                                      setBusinessProofUrl("");
+                                    }}
+                                  >
                                     <TrashIcon className="w-6 text-red-500" />
                                   </button>
                                 </div>
@@ -858,7 +873,7 @@ const Onboarding = () => {
                           />
                           <div className="image-item__btn-wrapper">
                             <button onClick={() => onImageRemove(index)}>
-                              Remove
+                              <TrashIcon className="w-6 text-red-500" />
                             </button>
                           </div>
                         </div>
@@ -905,7 +920,7 @@ const Onboarding = () => {
                           />
                           <div className="image-item__btn-wrapper">
                             <button onClick={() => onAttachmentRemove(index)}>
-                              Remove
+                              <TrashIcon className="w-6 text-red-500" />
                             </button>
                           </div>
                         </div>
@@ -933,7 +948,8 @@ const Onboarding = () => {
             <div className="w-full flex justify-end mt-8">
               <button
                 onClick={() => saveHandler()}
-                className="px-10 rounded-xl py-2 bg-indigo-600 hover:bg-indigo-400 text-white"
+                disabled={packagesUploading || attachmentsUploading}
+                className="disabled:bg-gray-500 px-10 rounded-xl py-2 bg-indigo-600 hover:bg-indigo-400 text-white"
               >
                 Save and continue
               </button>
