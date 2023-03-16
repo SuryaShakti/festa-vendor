@@ -69,7 +69,7 @@ const Home = () => {
       phone: phone,
       operation: operation,
       role: 4,
-      otp: "123456",
+      otp: otp,
     });
 
     var config = {

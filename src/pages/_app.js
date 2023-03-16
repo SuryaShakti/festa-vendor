@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DefaultLayout from "../components/Layouts/DefaultLayout";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 function MyApp({ Component, pageProps }) {
   const Router = useRouter();

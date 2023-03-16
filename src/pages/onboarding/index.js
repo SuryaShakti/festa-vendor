@@ -11,6 +11,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import React, { Fragment, useEffect, useState } from "react";
 import ImageUploading from "react-images-uploading";
+import { toast } from "react-toastify";
 
 const Onboarding = () => {
   const [step, setStep] = useState(0);
@@ -46,6 +47,8 @@ const Onboarding = () => {
   const [instagram, setInstagram] = useState("");
   const [facebook, setFacebook] = useState("");
   const [description, setDescription] = useState("");
+  const [businessProofType, setBusinessProofType] = useState("");
+  const [identityType, setIdentityType] = useState("");
 
   const router = useRouter();
 
@@ -69,11 +72,55 @@ const Onboarding = () => {
   };
 
   const secondHandler = () => {
-    setStep(1);
+    if (brandName.trim() === "") {
+      toast.error("please enter the brand name", {
+        position: "bottom-right",
+      });
+    } else if (!selectedCat?._id) {
+      toast.error("please select a category", {
+        position: "bottom-right",
+      });
+    } else if (!selectedSubCat?._id) {
+      toast.error("please select a sub category", {
+        position: "bottom-right",
+      });
+    } else if (comAddress.trim() === "") {
+      toast.error("please enter your complete address", {
+        position: "bottom-right",
+      });
+    } else if (comAddress.trim() === "") {
+      toast.error("please select a location.", {
+        position: "bottom-right",
+      });
+    } else {
+      setStep(1);
+    }
   };
 
   const thirdHandler = () => {
-    setStep(2);
+    if (!photoUrl) {
+      toast.error("please upload your identity proof", {
+        position: "bottom-right",
+      });
+    } else if (!businessProofUrl) {
+      toast.error("please upload your business proof", {
+        position: "bottom-right",
+      });
+    } else if (!identityType) {
+      toast.error("please select your identity type", {
+        position: "bottom-right",
+      });
+    } else if (!businessProofType) {
+      toast.error("please upload your business type", {
+        position: "bottom-right",
+      });
+    } else if (description.trim() === "") {
+      toast.error("please enter your desription", {
+        position: "bottom-right",
+      });
+    } else {
+      setStep(2);
+    }
   };
 
   const imageUpload = async (blob) => {
@@ -254,7 +301,16 @@ const Onboarding = () => {
         addressLine1: comAddress,
       },
       coordinates: [25.8014, 85.478],
-      businessProof: businessProofUrl,
+      businessProof: [
+        {
+          type: identityType,
+          link: photoUrl,
+        },
+        {
+          type: businessProofType,
+          link: businessProofUrl,
+        },
+      ],
       attachments: attachmentsUrl,
       packages: packagesLinks,
       categories: [
@@ -276,7 +332,16 @@ const Onboarding = () => {
         addressLine1: comAddress,
       },
       coordinates: [25.8014, 85.478],
-      businessProof: businessProofUrl,
+      businessProof: [
+        {
+          type: "Vote Id card",
+          link: "https://festa-event-dev.s3.ap-south-1.amazonaws.com/photos/1678724067087_image_picker2495915530613188681.jpg",
+        },
+        {
+          type: "Sales Tax certificate",
+          link: "https://festa-event-dev.s3.ap-south-1.amazonaws.com/photos/1678724067237_0c9ee23e-4ae5-40a3-a5d2-44288e4fe82f8065014382952304833.jpg",
+        },
+      ],
       attachments: attachmentsUrl,
       packages: packagesLinks,
       categories: [
@@ -305,6 +370,12 @@ const Onboarding = () => {
     await axios(config)
       .then(function (response) {
         console.log(response.data);
+        const user1 = JSON.parse(localStorage.getItem("user"));
+        const _user = {
+          ...user1,
+          vendor: response.data._id,
+        };
+        localStorage.setItem("user", _user);
         router.push("/dashboard");
       })
       .catch(function (error) {
@@ -611,10 +682,10 @@ const Onboarding = () => {
                       )}
                     </ImageUploading>
                     <select
-                      id="countries"
+                      id="identity"
                       onChange={(e) => {
                         console.log(e.target.value);
-                        
+                        setIdentityType(e.target.value);
                       }}
                       className="bg-gray-100 h-10 bg-opacity-20 border px-2 border-gray-300 text-white text-sm rounded-lg"
                     >
@@ -689,7 +760,11 @@ const Onboarding = () => {
                       )}
                     </ImageUploading>
                     <select
-                      id="countries"
+                      id="business type"
+                      onChange={(e) => {
+                        console.log(e.target.value);
+                        setBusinessProofType(e.target.value);
+                      }}
                       className="bg-gray-100 h-10 bg-opacity-20 border px-2 border-gray-300 text-white text-sm rounded-lg"
                     >
                       <option className="text-gray-400" selected>

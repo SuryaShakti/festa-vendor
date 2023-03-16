@@ -41,6 +41,7 @@ const navigation = [
   { name: "Messages", href: "/messages", icon: CalendarIcon, current: false },
   { name: "Feedback", href: "/feedback", icon: ChartBarIcon, current: false },
   { name: "Support", href: "/support", icon: ChartBarIcon, current: false },
+  { name: "Profile", href: "/profile", icon: ChartBarIcon, current: false },
 ];
 
 function classNames(...classes) {
