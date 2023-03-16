@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import OtpInput from "../components/OtpInput";
+import Spinner from "@/components/Spinner";
 
 const Home = () => {
   const [status, setStatus] = useState(0);
@@ -16,14 +17,15 @@ const Home = () => {
   const [otp, setOtp] = useState("");
   const [operation, setOperation] = useState("");
   const [error, setError] = useState({ field: "", message: "" });
-
-  const googleLoginHandler = () => {};
-  const fbLoginHandler = () => {};
+  const [loading, setLoading] = useState(false);
 
   const loginHandler = async (operation) => {
     if (phone.trim() !== "") {
       await sendOtp(operation);
     } else {
+      toast.error("please enter your phone number", {
+        position: "bottom-right",
+      });
       return;
     }
   };
@@ -34,6 +36,7 @@ const Home = () => {
       operation: operation,
       role: 4,
     });
+    setLoading(true);
 
     var config = {
       method: "post",
@@ -43,16 +46,20 @@ const Home = () => {
       },
       data: data,
     };
-
     await axios(config)
       .then(function (response) {
         console.log(response.data);
         setStatus(2);
         // return response.data;
+        setLoading(false);
       })
       .catch(function (error) {
         console.log(error.response.data.message);
         setError({ field: "phone", message: error.response.data.message });
+        toast.error(error.response.data.message, {
+          position: "bottom-right",
+        });
+        setLoading(false);
       });
   };
 
@@ -65,65 +72,85 @@ const Home = () => {
   };
 
   const verifyOtp = async (operation) => {
-    var data = JSON.stringify({
-      phone: phone,
-      operation: operation,
-      role: 4,
-      otp: otp,
-    });
-
-    var config = {
-      method: "patch",
-      url: "https://api.test.festabash.com/v1/login/phone-login",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
-
-    await axios(config)
-      .then(async function (response) {
-        console.log(response.data);
-
-        if (operation === "signup") {
-          var data2 = JSON.stringify({
-            role: 4,
-            registrationToken: response.data.registrationToken,
-            name: username,
-            phone: phone,
-          });
-
-          var config2 = {
-            method: "post",
-            url: "https://api.test.festabash.com/v1/user",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            data: data2,
-          };
-
-          await axios(config2)
-            .then(function (response) {
-              console.log(response.data);
-              localStorage.setItem("token", response.data.accessToken);
-              localStorage.setItem("user", JSON.stringify(response.data.user));
-              setError({ field: "", message: "" });
-              router.push("/onboarding");
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-        } else {
-          localStorage.setItem("token", response.data.accessToken);
-          localStorage.setItem("user", JSON.stringify(response.data.user));
-          setError({ field: "", message: "" });
-          router.push("/dashboard");
-          return;
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
+    if (otp.trim() !== "") {
+      var data = JSON.stringify({
+        phone: phone,
+        operation: operation,
+        role: 4,
+        otp: otp,
       });
+      setLoading(true);
+      var config = {
+        method: "patch",
+        url: "https://api.test.festabash.com/v1/login/phone-login",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+
+      await axios(config)
+        .then(async function (response) {
+          console.log(response.data);
+
+          if (operation === "signup") {
+            var data2 = JSON.stringify({
+              role: 4,
+              registrationToken: response.data.registrationToken,
+              name: username,
+              phone: phone,
+            });
+
+            var config2 = {
+              method: "post",
+              url: "https://api.test.festabash.com/v1/user",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              data: data2,
+            };
+
+            await axios(config2)
+              .then(function (response) {
+                console.log(response.data);
+                localStorage.setItem("token", response.data.accessToken);
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify(response.data.user)
+                );
+                setError({ field: "", message: "" });
+                router.push("/onboarding");
+                setLoading(false);
+              })
+              .catch(function (error) {
+                console.log(error);
+                toast.error(error.response.data.message, {
+                  position: "bottom-right",
+                });
+                setLoading(false);
+              });
+          } else {
+            localStorage.setItem("token", response.data.accessToken);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            setError({ field: "", message: "" });
+            router.push("/dashboard");
+            setLoading(false);
+
+            return;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+          toast.error(error.response.data.message, {
+            position: "bottom-right",
+          });
+          setLoading(false);
+        });
+    } else {
+      toast.error("please enter valid otp", {
+        position: "bottom-right",
+      });
+    }
   };
 
   function phoneChange(event) {
@@ -206,11 +233,18 @@ const Home = () => {
                     setOperation("login");
                     loginHandler("login");
                   }}
-                  className="w-full py-2 bg-indigo-700 text-white rounded-xl hover:bg-indigo-600 transform duration-200 shadow"
+                  disabled={loading}
+                  className="disabled:bg-gray-500 w-full py-2 bg-indigo-700 text-white rounded-xl hover:bg-indigo-600 transform duration-200 shadow"
                 >
-                  Send OTP
+                  {loading ? (
+                    <div className="flex justify-center space-x-2 items-center">
+                      <Spinner /> <div>{"Send OTP"}</div>
+                    </div>
+                  ) : (
+                    "Send OTP"
+                  )}
                 </button>
-               
+
                 <div className="w-full text-xs text-gray-400 justify-center mt-2 flex space-x-1">
                   <div>Don't have an account ?</div>
                   <div
@@ -255,9 +289,16 @@ const Home = () => {
                     setOperation("signup");
                     registerHandler("signup");
                   }}
-                  className="w-full py-2 bg-indigo-700 text-white rounded-xl hover:bg-indigo-600 transform duration-200 shadow"
+                  disabled={loading}
+                  className="disabled:bg-gray-500 w-full py-2 bg-indigo-700 text-white rounded-xl hover:bg-indigo-600 transform duration-200 shadow"
                 >
-                  Send OTP
+                  {loading ? (
+                    <div className="flex justify-center space-x-2 items-center">
+                      <Spinner /> <div>{"Send OTP"}</div>
+                    </div>
+                  ) : (
+                    "Send OTP"
+                  )}
                 </button>
                 <div className="w-full text-xs text-gray-400 justify-center mt-2 flex space-x-1">
                   <div>Already have an account ?</div>
@@ -281,9 +322,16 @@ const Home = () => {
                 </div>
                 <button
                   onClick={() => verifyOtp(operation)}
-                  className="w-full py-2 bg-indigo-700 text-white rounded-xl hover:bg-indigo-600 transform duration-200 shadow"
+                  disabled={loading}
+                  className="disabled:bg-gray-500 w-full py-2 bg-indigo-700 text-white rounded-xl hover:bg-indigo-600 transform duration-200 shadow"
                 >
-                  Verify
+                  {loading ? (
+                    <div className="flex justify-center space-x-2 items-center">
+                      <Spinner /> <div>{"Verify"}</div>
+                    </div>
+                  ) : (
+                    "Verify"
+                  )}
                 </button>
               </div>
             )}
