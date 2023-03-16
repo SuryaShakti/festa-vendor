@@ -152,7 +152,7 @@ const Home = () => {
           </div>
           <div className=" relative flex flex-col justify-center items-center">
             <div className="w-full flex justify-center items-center">
-              <img src={"/images/logofinal.png"} className="w-32 my-3" />
+              <img src={"/images/logoFinal.png"} className="w-32 my-3" />
             </div>
 
             <div className="mt-3 w-10/12 rounded-xl bg-white shadow grid grid-cols-2 h-12">
