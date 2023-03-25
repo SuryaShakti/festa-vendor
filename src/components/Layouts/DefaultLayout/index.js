@@ -27,7 +27,7 @@ import ConfirmationDialog from "../../ConfirmationDialog";
 
 const navigation = [
   {
-    name: "Dasboard",
+    name: "Dashboard",
     href: "/dashboard",
     icon: HomeIcon,
     current: false,

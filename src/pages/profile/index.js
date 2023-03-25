@@ -303,7 +303,7 @@ const profile = () => {
     attachmentsUrl.length > 0 ? (data.attachments = attachmentsUrl) : null;
 
     var config = {
-      method: "patch",
+      method: "patch",  
       maxBodyLength: Infinity,
       url: `https://api.test.festabash.com/v1/vendor-management/vendor/${id}`,
       headers: {

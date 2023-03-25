@@ -18,6 +18,14 @@ const Home = () => {
   const [operation, setOperation] = useState("");
   const [error, setError] = useState({ field: "", message: "" });
   const [loading, setLoading] = useState(false);
+  const [isVendor, setIsVendor] = useState(true);
+
+  const toggleState = () => {
+    setIsVendor(!isVendor);
+    // if (!isVendor) user {
+    router.push("https:///festa-dashboard-client.vercel.app/");
+    // }
+  };
 
   const loginHandler = async (operation) => {
     if (phone.trim() !== "") {
@@ -228,6 +236,33 @@ const Home = () => {
                     <p class="mt-px text-xs text-white">{error.message}</p>
                   )}
                 </div>
+                <div className="my-2">
+                  <label
+                    htmlFor="toggle"
+                    className="flex items-center cursor-pointer"
+                  >
+                    <div className="mr-3 text-gray-100 font-medium">User</div>
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        id="toggle"
+                        name="toggle"
+                        className="sr-only"
+                        onChange={toggleState}
+                        checked={isVendor}
+                      />
+                      <div className="block bg-gray-600 w-12 h-6 rounded-full"></div>
+                      <div
+                        className={`${
+                          isVendor
+                            ? "translate-x-6 bg-indigo-600"
+                            : "translate-x-0 bg-gray-200"
+                        } absolute left-0 top-0 w-6 h-6 rounded-full transition-transform`}
+                      ></div>
+                    </div>
+                    <div className="ml-3 text-gray-100 font-medium">Vendor</div>
+                  </label>
+                </div>
                 <button
                   onClick={() => {
                     setOperation("login");
@@ -284,6 +319,7 @@ const Home = () => {
                     />
                   </div>
                 </div>
+
                 <button
                   onClick={() => {
                     setOperation("signup");
