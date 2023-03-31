@@ -37,6 +37,14 @@ export default function Home() {
       });
   };
 
+  const getDate = (date) => {
+    const inputDate = new Date(date);
+    const options = { month: "long", day: "numeric", year: "numeric" };
+    const outputDate = inputDate.toLocaleDateString("en-US", options);
+
+    return outputDate;
+  };
+
   useEffect(() => {
     getDetails();
   }, []);
@@ -65,7 +73,31 @@ export default function Home() {
             <Spinner />
           </div>
         ) : (
-          <ChartComponent details={data} />
+          <div className="w-full md:w-2/3">
+            <ChartComponent details={data} />
+
+            <div className="my-5">
+              <div>
+                <div className="text-2xl fonr-bold text-white">
+                  Upcoming Projects
+                </div>
+                <div className="h-px bg-white w-32 mt-1"></div>
+
+                <div>
+                  {data?.upcomingProjects?.map((project, index) => (
+                    <div
+                      className="my-3 shadow bg-white bg-opacity-30 rounded-xl p-3 w-full"
+                      key={index}
+                    >
+                      <div>{project.name}</div>
+                      <div>{getDate(project.startTime)}</div>
+                      <div>{project.description}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </>

@@ -9,11 +9,13 @@ const MapAutocomplete = ({
   setAddress,
   addressLine,
   setAddressLine,
+  cord,
+  setCord,
 }) => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [markerPosition, setMarkerPosition] = useState({
-    lat: 20.3255718,
-    lng: 85.8102212,
+    lat: cord[1],
+    lng: cord[0],
   });
   const autocompleteRef = useRef(null);
   const markerRef = useRef(null);
@@ -50,6 +52,7 @@ const MapAutocomplete = ({
         place.geometry.location.lat(),
       ],
     });
+    setCord([place.geometry.location.lng(), place.geometry.location.lat()]);
 
     renderMarkers();
   };
@@ -77,6 +80,8 @@ const MapAutocomplete = ({
         ...address,
         coordinates: [position.lng(), position.lat()],
       });
+
+      setCord([position.lng(), position.lat()]);
     });
 
     renderMarkers();

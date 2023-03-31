@@ -85,11 +85,7 @@ const Onboarding = () => {
       toast.error("please select a sub category", {
         position: "bottom-right",
       });
-    } else if (comAddress.trim() === "") {
-      toast.error("please enter your complete address", {
-        position: "bottom-right",
-      });
-    } else if (comAddress.trim() === "") {
+    } else if (cord.length === 0) {
       toast.error("please select a location.", {
         position: "bottom-right",
       });
@@ -123,6 +119,34 @@ const Onboarding = () => {
       setStep(2);
     }
   };
+
+  const getDeatils = async () => {
+    const token = localStorage.getItem("token");
+    console.log(JSON.parse(localStorage.getItem("user")));
+    const id = JSON.parse(localStorage.getItem("user")).vendor;
+    var config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `https://api.test.festabash.com/v1/vendor-management/vendor/${id}?$populate=address.city&$populate=categories.category&$populate=categories.subCategories`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    await axios(config)
+      .then(function (response) {
+        console.log(response.data);
+        router.push("/dashboard");
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getDeatils();
+  }, []);
 
   const imageUpload = async (blob) => {
     const token = localStorage.getItem("token");
@@ -301,7 +325,7 @@ const Onboarding = () => {
       address: {
         addressLine1: comAddress,
       },
-      coordinates: [25.8014, 85.478],
+      coordinates: cord,
       businessProof: [
         {
           type: identityType,
@@ -958,7 +982,7 @@ const Onboarding = () => {
         )}
       </div>
 
-      {/* <Transition appear show={venueOpen} as={Fragment}>
+      <Transition appear show={venueOpen} as={Fragment}>
         <Dialog
           as="div"
           className="relative z-50"
@@ -1002,6 +1026,8 @@ const Onboarding = () => {
                       setAddress={setAddress}
                       setAddressLine={setAddressLine}
                       address={address}
+                      setCord={setCord}
+                      cord={cord}
                     />
                   </div>
 
@@ -1009,7 +1035,9 @@ const Onboarding = () => {
                     <button
                       type="button"
                       className="inline-flex mt-10 justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={() => venueSave()}
+                      onClick={() => {
+                        setVenueOpen(false);
+                      }}
                     >
                       {loading ? (
                         <div className="flex w-max mx-auto justify-between items-center space-x-2">
@@ -1026,7 +1054,7 @@ const Onboarding = () => {
             </div>
           </div>
         </Dialog>
-      </Transition> */}
+      </Transition>
     </div>
   );
 };

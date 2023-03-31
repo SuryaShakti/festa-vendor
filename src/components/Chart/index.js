@@ -16,7 +16,12 @@ const ChartComponent = ({ details }) => {
     datasets: [
       {
         label: "Events",
-        data: details?.projects?.map((lead, index) => lead.count),
+        data:
+          status === 0
+            ? details?.projects?.map((lead, index) => lead.count)
+            : status === 1
+            ? details?.leads?.map((lead, index) => lead.count)
+            : details?.projects?.map((lead, index) => lead.count),
         fill: false,
         borderColor: "#4BC0C0",
         backgroundColor: "#4BC0C0",
@@ -77,6 +82,7 @@ const ChartComponent = ({ details }) => {
       },
       y: {
         min: 0,
+        labels: [0, 2, 4, 6, 8, 10, 12, 14],
         ticks: {
           font: {
             color: "white", // change x-axis labels text color to white
@@ -91,7 +97,7 @@ const ChartComponent = ({ details }) => {
   console.log("7648746846847", details);
 
   return (
-    <div className="z-50 bg-gray-100 bg-opacity-10 w-full md:w-2/3 rounded-xl">
+    <div className="z-50 bg-gray-100 bg-opacity-10 w-full rounded-xl">
       <div className="w-full h-12 bg-white rounded-t-xl  items-center flex justify-between my-4">
         <div
           onClick={() => setStatus(0)}

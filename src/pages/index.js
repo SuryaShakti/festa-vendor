@@ -72,11 +72,25 @@ const Home = () => {
   };
 
   const registerHandler = async (operation) => {
-    if (phone.trim() !== "" && username.trim() !== "") {
-      await sendOtp(operation);
-    } else {
+    if (username.trim() === "") {
+      toast.error("please enter your name", {
+        position: "bottom-right",
+      });
       return;
+    } else if (phone.trim() === "") {
+      toast.error("please enter your phone number", {
+        position: "bottom-right",
+      });
+      return;
+    } else {
+      await sendOtp(operation);
     }
+
+    // if (phone.trim() !== "" && username.trim() !== "") {
+    //   await sendOtp(operation);
+    // } else {
+    //   return;
+    // } 
   };
 
   const verifyOtp = async (operation) => {
@@ -255,7 +269,7 @@ const Home = () => {
                       <div
                         className={`${
                           isVendor
-                            ? "translate-x-6 bg-indigo-600"
+                            ? "translate-x-6 bg-gray-200"
                             : "translate-x-0 bg-gray-200"
                         } absolute left-0 top-0 w-6 h-6 rounded-full transition-transform`}
                       ></div>

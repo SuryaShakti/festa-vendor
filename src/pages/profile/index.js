@@ -1,4 +1,5 @@
 import Spinner from "@/components/Spinner";
+import ViewMap from "@/components/ViewMap";
 import { Menu, Transition } from "@headlessui/react";
 import {
   ChevronDownIcon,
@@ -44,6 +45,7 @@ const profile = () => {
   const [facebook, setFacebook] = useState("");
   const [description, setDescription] = useState("");
   const [businessProofType, setBusinessProofType] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   const [identityType, setIdentityType] = useState("");
 
@@ -303,7 +305,7 @@ const profile = () => {
     attachmentsUrl.length > 0 ? (data.attachments = attachmentsUrl) : null;
 
     var config = {
-      method: "patch",  
+      method: "patch",
       maxBodyLength: Infinity,
       url: `https://api.test.festabash.com/v1/vendor-management/vendor/${id}`,
       headers: {
@@ -488,10 +490,10 @@ const profile = () => {
             Locate on map <span className=" text-sm">*</span>
           </div>
           <div
-            onClick={() => setVenueOpen(true)}
+            onClick={() => setIsOpen(true)}
             className="mt-3 w-dull py-2 border text-white border-white   flex justify-center items-center hover:bg-teal-50 transition duration-200 hover:text-teal-500 rounded-xl cursor-pointer"
           >
-            Enter your Location
+            View your Location
           </div>
         </div>
         <div className="my-3">
@@ -788,6 +790,9 @@ const profile = () => {
           Save
         </button>
       </div>
+      {isOpen && (
+        <ViewMap isOpen={isOpen} setIsOpen={setIsOpen} coordinates={cord} />
+      )}
     </div>
   );
 };
