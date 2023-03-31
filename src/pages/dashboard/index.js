@@ -89,9 +89,9 @@ export default function Home() {
                       className="my-3 shadow bg-white bg-opacity-30 rounded-xl p-3 w-full"
                       key={index}
                     >
-                      <div>{project.name}</div>
-                      <div>{getDate(project.startTime)}</div>
-                      <div>{project.description}</div>
+                      <div className="text-lg ">{project.name}</div>
+                      <div className="text-sm text-green-500">{getDate(project.startTime)}</div>
+                      <div className="text-sm text-gray-200">{project.description}</div>
                     </div>
                   ))}
                 </div>
