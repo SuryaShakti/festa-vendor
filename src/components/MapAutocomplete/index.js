@@ -14,8 +14,8 @@ const MapAutocomplete = ({
 }) => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [markerPosition, setMarkerPosition] = useState({
-    lat: cord[1],
-    lng: cord[0],
+    lat: cord[1] ? cord[1] : 25,
+    lng: cord[0] ? cord[0] : 84,
   });
   const autocompleteRef = useRef(null);
   const markerRef = useRef(null);
@@ -72,6 +72,7 @@ const MapAutocomplete = ({
       const position = marker.getPosition();
       console.log("Latitude:", position.lat());
       console.log("Longitude:", position.lng());
+      console.log(marker);
       setMarkerPosition({
         lat: position.lat(),
         lng: position.lng(),
@@ -98,7 +99,7 @@ const MapAutocomplete = ({
 
   return (
     <>
-      <div>
+      {/* <div>
         <input
           type="text"
           placeholder="Enter your address"
@@ -115,7 +116,7 @@ const MapAutocomplete = ({
           onChange={(e) => setCity(e.target.value)}
           className="px-3 py-2 mt-3 border border-md w-full"
         />
-      </div>
+      </div> */}
       <LoadScript
         libraries={["places"]}
         googleMapsApiKey={"AIzaSyCDCQBnv82-gPUl8bkOuTyQdoELx2nm8eI"}

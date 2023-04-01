@@ -50,6 +50,8 @@ const Onboarding = () => {
   const [businessProofType, setBusinessProofType] = useState("");
   const [identityType, setIdentityType] = useState("");
   const [saveLoading, setSaveLoading] = useState(false);
+  const [fbError, setFbError] = useState("");
+  const [instaError, setInstaError] = useState("");
 
   const router = useRouter();
 
@@ -410,6 +412,28 @@ const Onboarding = () => {
         console.log(error);
         setSaveLoading(false);
       });
+  };
+
+  const fbonChange = (e) => {
+    setFacebook(e.target.value);
+    const regex = /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9(\.\?)?]/;
+    if (regex.test(e.target.value)) {
+      // Valid Facebook profile link
+      setFbError("");
+    } else {
+      // Invalid Facebook profile link
+      setFbError("Invalid Facebook Link!");
+    }
+  };
+
+  const instaOnChange = (e) => {
+    setInstagram(e.target.value);
+    const regex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9(\.\?)?]/;
+    if (regex.test(e.target.value)) {
+      setInstaError("");
+    } else {
+      setInstaError("Invalid Instagram Link!");
+    }
   };
 
   useEffect(() => {
@@ -959,15 +983,21 @@ const Onboarding = () => {
               <input
                 className="w-full bg-transparent py-2 px-3 my-2 border rounded-lg border-white"
                 value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
+                onChange={(e) => instaOnChange(e)}
                 placeholder="Enter your instagram link"
               />
+              {instaError.trim() !== "" && (
+                <div className="my- text-xs text-red-500">{instaError}</div>
+              )}
               <input
                 className="w-full bg-transparent py-2 px-3 my-2 border rounded-lg border-white"
                 value={facebook}
-                onChange={(e) => setFacebook(e.target.value)}
+                onChange={(e) => fbonChange(e)}
                 placeholder="Enter your facebook link"
               />
+              {fbError.trim() !== "" && (
+                <div className="my- text-xs text-red-500">{fbError}</div>
+              )}
             </div>
             <div className="w-full flex justify-end mt-8">
               <button

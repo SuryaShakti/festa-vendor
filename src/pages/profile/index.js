@@ -46,6 +46,8 @@ const profile = () => {
   const [description, setDescription] = useState("");
   const [businessProofType, setBusinessProofType] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [fbError, setFbError] = useState("");
+  const [instaError, setInstaError] = useState("");
 
   const [identityType, setIdentityType] = useState("");
 
@@ -266,6 +268,9 @@ const profile = () => {
         setAttachmentsUrl(response.data.attachments);
         setPackagesLinks(response.data.packages);
         setBusinessProofType(response.data.businessProof[1].type);
+        setIdentityType(response.data.businessProof[0].type);
+        setFacebook(response.data.socialLinks.facebook);
+        setInstagram(response.data.socialLinks.instagram);
       })
       .catch(function (error) {
         console.log(error);
@@ -299,6 +304,10 @@ const profile = () => {
           subCategories: [selectedSubCat],
         },
       ],
+      socialLinks: {
+        facebook: facebook,
+        instagram: instagram,
+      },
     };
 
     packagesLinks.length > 0 ? (data.packages = packagesLinks) : null;
@@ -322,6 +331,29 @@ const profile = () => {
       .catch(function (error) {
         console.log(error);
       });
+  };
+
+  const fbonChange = (e) => {
+    setFacebook(e.target.value);
+    const regex = /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9(\.\?)?]/;
+
+    if (regex.test(e.target.value)) {
+      // Valid Facebook profile link
+      setFbError("");
+    } else {
+      // Invalid Facebook profile link
+      setFbError("Invalid Facebook Link!");
+    }
+  };
+
+  const instaOnChange = (e) => {
+    setInstagram(e.target.value);
+    const regex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9(\.\?)?]/;
+    if (regex.test(e.target.value)) {
+      setInstaError("");
+    } else {
+      setInstaError("Invalid Instagram Link!");
+    }
   };
 
   useEffect(() => {
@@ -771,15 +803,21 @@ const profile = () => {
           <input
             className="w-full bg-transparent py-2 px-3 my-2 border rounded-lg border-white"
             value={instagram}
-            onChange={(e) => setInstagram(e.target.value)}
+            onChange={(e) => instaOnChange(e)}
             placeholder="Enter your instagram link"
           />
+          {instaError.trim() !== "" && (
+            <div className="my- text-xs text-red-500">{instaError}</div>
+          )}
           <input
             className="w-full bg-transparent py-2 px-3 my-2 border rounded-lg border-white"
             value={facebook}
-            onChange={(e) => setFacebook(e.target.value)}
+            onChange={(e) => fbonChange(e)}
             placeholder="Enter your facebook link"
           />
+          {fbError.trim() !== "" && (
+            <div className="my- text-xs text-red-500">{fbError}</div>
+          )}
         </div>
       </div>
       <div className="w-full flex justify-end">
