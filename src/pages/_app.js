@@ -4,7 +4,17 @@ import React, { useEffect, useState } from "react";
 import DefaultLayout from "../components/Layouts/DefaultLayout";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import io from "socket.io-client";
+import feathers from "@feathersjs/feathers";
+import socketio from "@feathersjs/socketio-client";
 
+export const socketClient = io(process.env.NEXT_PUBLIC_SOCKET);
+export const socketApp = feathers();
+socketApp.configure(
+  socketio(socketClient, {
+    transports: ["websocket"],
+  })
+);
 
 function MyApp({ Component, pageProps }) {
   const Router = useRouter();
@@ -27,8 +37,6 @@ function MyApp({ Component, pageProps }) {
         setLoading(false);
       }
     }
-
-    
   }, []);
 
   return (

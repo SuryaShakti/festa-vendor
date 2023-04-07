@@ -26,7 +26,10 @@
     "react-rating-stars-component": "2.2.0",
     "react-slider": "^2.0.4",
     "react-toastify": "^9.1.1",
-    "swiper": "^9.0.5"
+    "swiper": "^9.0.5",
+    "socket.io-client": "2.4.0",
+    "@feathersjs/feathers": "^4.5.11",
+    "@feathersjs/socketio-client": "^4.5.11"
   },
   "devDependencies": {
     "@types/node": "18.11.3",

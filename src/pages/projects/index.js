@@ -8,8 +8,8 @@ const index = () => {
   const [status, setStatus] = useState(0);
   const [loading, setLoading] = useState(false);
   const [leads, setLeads] = useState([]);
-  const [projects, setProjects] = useState([]);
   const router = useRouter();
+  const [projects, setProjects] = useState([]);
 
   const getProjects = async () => {
     const token = localStorage.getItem("token");
@@ -17,7 +17,7 @@ const index = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/vendor-management/vendor-event-details?status=1",
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor-event-details?status=1`,
       headers: { Authorization: `Bearer ${token}` },
     };
     setLoading(true);
@@ -40,7 +40,7 @@ const index = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/vendor-management/vendor-event-details?status=2",
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor-event-details?status=2`,
       headers: { Authorization: `Bearer ${token}` },
     };
 

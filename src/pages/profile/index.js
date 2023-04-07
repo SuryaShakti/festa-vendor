@@ -57,7 +57,7 @@ const profile = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/category",
+      url: `${process.env.NEXT_PUBLIC_API_URL}category`,
     };
     setLoading(true);
     await axios(config)
@@ -89,7 +89,7 @@ const profile = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result[0].link);
@@ -120,7 +120,7 @@ const profile = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result.map((item) => item.link));
@@ -151,7 +151,7 @@ const profile = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result.map((item) => item.link));
@@ -181,7 +181,7 @@ const profile = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result[0].link);
@@ -247,7 +247,7 @@ const profile = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `https://api.test.festabash.com/v1/vendor-management/vendor/${id}?$populate=address.city&$populate=categories.category&$populate=categories.subCategories`,
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor/${id}?$populate=address.city&$populate=categories.category&$populate=categories.subCategories`,
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -316,7 +316,7 @@ const profile = () => {
     var config = {
       method: "patch",
       maxBodyLength: Infinity,
-      url: `https://api.test.festabash.com/v1/vendor-management/vendor/${id}`,
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor/${id}`,
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

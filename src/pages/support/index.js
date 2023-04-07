@@ -2,6 +2,14 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useState, useEffect, Fragment } from "react";
 import Spinner from "../../components/Spinner";
+import { Dialog, Menu, Transition } from "@headlessui/react";
+import ImageUploading from "react-images-uploading";
+import {
+  CalendarIcon,
+  ChevronDownIcon,
+  PencilAltIcon,
+  TrashIcon,
+} from "@heroicons/react/outline";
 
 const Support = () => {
   const [tickets, setTickets] = useState([]);
@@ -9,13 +17,80 @@ const Support = () => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({});
   const router = useRouter();
+  const [data, setData] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState({});
+  const [description, setDescription] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState("");
+
+  const [projects, setProjects] = useState([]);
+
+  const getProjects = async () => {
+    const token = localStorage.getItem("token");
+
+    var config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor-event-details?status=1`,
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    setLoading(true);
+
+    axios(config)
+      .then(function (response) {
+        console.log(response.data);
+        setProjects(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const imageUpload = async (blob) => {
+    const token = localStorage.getItem("token");
+
+    var formdata = new FormData();
+    formdata.append("file", blob);
+
+    console.log(formdata);
+    setPhotoUploading(true);
+
+    var requestOptions = {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formdata,
+      redirect: "follow",
+    };
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result[0].link);
+        setPhotoUrl(result[0].link);
+        setPhotoUploading(false);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        setPhotoUploading(false);
+      });
+  };
+
+  const onPostChange = async (imageList, addUpdateIndex) => {
+    // data for submit
+    console.log(imageList[0].file);
+    setPhoto(imageList);
+
+    await imageUpload(imageList[0].file);
+  };
 
   const getTickets = async () => {
     const token = localStorage.getItem("token");
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/help-center/support-ticket?$populate=event&$sort[createdAt]=-1",
+      url: `${process.env.NEXT_PUBLIC_API_URL}help-center/support-ticket?$populate=event&$sort[createdAt]=-1`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,6 +111,7 @@ const Support = () => {
 
   useEffect(() => {
     getTickets();
+    getProjects();
   }, []);
 
   useEffect(() => {
@@ -52,18 +128,15 @@ const Support = () => {
   const createSupportTicket = async () => {
     const token = localStorage.getItem("token");
     var data = JSON.stringify({
-      event: "63f6389f873454cd84677eb9",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,",
-      attachments: [
-        "https://festa-event-dev.s3.ap-south-1.amazonaws.com/photos/1666099611476_Hotel_test3.jpg",
-      ],
+      event: selectedEvent.event?._id ? selectedEvent.event?._id : "",
+      description: description,
+      attachments: [photoUrl],
     });
 
     var config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/help-center/support-ticket",
+      url: `${process.env.NEXT_PUBLIC_API_URL}help-center/support-ticket?$populate=event`,
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -73,7 +146,10 @@ const Support = () => {
 
     await axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        console.log(response.data);
+        const _data = [...tickets];
+        setTickets([..._data, response.data]);
+        setOpen(false);
       })
       .catch(function (error) {
         console.log(error);
@@ -92,7 +168,7 @@ const Support = () => {
           <div className="ml-4 mt-2 flex-shrink-0">
             <button
               type="button"
-              onClick={() => createSupportTicket()}
+              onClick={() => setOpen(true)}
               className="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Create a support ticket
@@ -158,6 +234,189 @@ const Support = () => {
           </div>
         )}
       </div>
+      <Transition appear show={open} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full h-[90vh] max-w-2xl transform overflow-hidden p-6 text-left rounded-2xl bg-white align-middle shadow-xl transition-all flex flex-col">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Create a support ticket
+                  </Dialog.Title>
+                  <div className="mt-2 flex-1">
+                    {" "}
+                    <div className="p-3">
+                      <div>
+                        <div className="text-gray-700 text-base font-medium mb-1">
+                          Event{" "}
+                          <span className="text-red-500 text-base">*</span>
+                        </div>
+                        <Menu
+                          as="div"
+                          className="relative  w-full inline-block text-left mt-2"
+                        >
+                          <div>
+                            <Menu.Button className="z-50 inline-flex text-gray-600 hover:bg-gray-200 w-full  justify-between rounded-md px-4 py-2 text-sm font-medium border border-gray-300  hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-opacity-75">
+                              {selectedEvent?.event?.name
+                                ? projects.filter(
+                                    (data) => data._id === selectedEvent._id
+                                  )[0].event.name
+                                : "Select an event"}
+                              <ChevronDownIcon
+                                className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
+                                aria-hidden="true"
+                              />
+                            </Menu.Button>
+                          </div>
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                          >
+                            <Menu.Items className="absolute  mt-2 w-max px- origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              <div className="px-1 py-1 ">
+                                {projects?.map((cat, index) => (
+                                  <Menu.Item
+                                    key={index}
+                                    onClick={() => setSelectedEvent(cat)}
+                                  >
+                                    {({ active }) => (
+                                      <button
+                                        className={`${
+                                          active
+                                            ? "bg-violet-500 text-white"
+                                            : "text-gray-900"
+                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                      >
+                                        {cat.event.name}
+                                      </button>
+                                    )}
+                                  </Menu.Item>
+                                ))}
+                              </div>
+                            </Menu.Items>
+                          </Transition>
+                        </Menu>
+                      </div>
+                      <div>
+                        <div className="text-gray-700 text-base font-medium mb-1">
+                          Description
+                        </div>
+                        <textarea
+                          className="w-full py-2 border rounded-lg px-4 border-gray-400"
+                          value={description}
+                          rows={4}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder={"Write your concern"}
+                        />
+                      </div>
+                      <div className="text-gray-700 text-base font-medium mb-1">
+                        Photo
+                      </div>
+                      <div className="flex">
+                        <ImageUploading
+                          multiple
+                          value={photo}
+                          onChange={onPostChange}
+                          dataURLKey="data_url"
+                          acceptType={["jpg", "jpeg", "png", "svg"]}
+                        >
+                          {({
+                            imageList,
+                            onImageUpload,
+                            onImageRemoveAll,
+                            onImageUpdate,
+                            onImageRemove,
+                            isDragging,
+                            dragProps,
+                          }) => (
+                            <div className="flex space-x-2">
+                              <button
+                                className="w-32 h-32 rounded-xl bg-gray-100 border flex justify-center items-center text-3xl font-black text-gray-600"
+                                onClick={onImageUpload}
+                                {...dragProps}
+                              >
+                                +
+                              </button>
+                              {photoUploading && (
+                                <div>
+                                  <Spinner />
+                                </div>
+                              )}
+
+                              {!photoUploading &&
+                                imageList.map((image, index) => (
+                                  <div key={index} className="">
+                                    <img
+                                      src={image.data_url}
+                                      alt=""
+                                      width="100"
+                                    />
+                                    <div className="flex space-x-3 justify-end pt-1 items-center">
+                                      <button
+                                        onClick={() => onImageUpdate(index)}
+                                      >
+                                        <PencilAltIcon className="w-6 text-gray-500" />
+                                      </button>
+                                      <button onClick={() => setPhoto("")}>
+                                        <TrashIcon className="w-6 text-red-500" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </ImageUploading>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-full mt-4">
+                    <button
+                      type="button"
+                      className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={() => createSupportTicket()}
+                    >
+                      Create
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 };

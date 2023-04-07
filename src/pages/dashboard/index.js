@@ -18,7 +18,7 @@ export default function Home() {
     var config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/vendor-management/vendor-dashboard",
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor-dashboard`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -90,8 +90,12 @@ export default function Home() {
                       key={index}
                     >
                       <div className="text-lg ">{project.name}</div>
-                      <div className="text-sm text-green-500">{getDate(project.startTime)}</div>
-                      <div className="text-sm text-gray-200">{project.description}</div>
+                      <div className="text-sm text-green-500">
+                        {getDate(project.startTime)}
+                      </div>
+                      <div className="text-sm text-gray-200">
+                        {project.description}
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -1,6 +1,6 @@
 import MapAutocomplete from "@/components/MapAutocomplete";
 import Spinner from "@/components/Spinner";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Dialog, Listbox, Menu, Transition } from "@headlessui/react";
 import {
   ChevronDownIcon,
   DocumentAddIcon,
@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import React, { Fragment, useEffect, useState } from "react";
 import ImageUploading from "react-images-uploading";
 import { toast } from "react-toastify";
+import { CheckIcon } from "@heroicons/react/solid";
 
 const Onboarding = () => {
   const [step, setStep] = useState(0);
@@ -52,14 +53,57 @@ const Onboarding = () => {
   const [saveLoading, setSaveLoading] = useState(false);
   const [fbError, setFbError] = useState("");
   const [instaError, setInstaError] = useState("");
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [maxBudget, setMaxBudget] = useState();
   const router = useRouter();
+
+  const LANGUAGES = [
+    "Hindi",
+    "English",
+    "Punjabi",
+    "Bengali",
+    "Telugu",
+    "Kannada",
+    "Tamil",
+    "Malyalam",
+    "Marathi",
+    "Urdu",
+    "Assamese",
+    "Odia",
+    "Sindhi",
+    "Nepali",
+    "Maithili",
+    "Santali",
+    "Kashmiri",
+  ];
+
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
+
+  function handleDropdownClick(e) {
+    setIsOpen(!isOpen);
+  }
+
+  function handleCheckboxChange(e) {
+    const value = e.target.value;
+    setIsOpen(false);
+    if (e.target.checked) {
+      setSelectedLanguages((selectedLanguages) => [
+        ...selectedLanguages,
+        value,
+      ]);
+    } else {
+      setSelectedLanguages((selectedLanguages) =>
+        selectedLanguages.filter((language) => language !== value)
+      );
+    }
+    console.log(selectedLanguages);
+  }
 
   const getCategories = async () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/category",
+      url: `${process.env.NEXT_PUBLIC_API_URL}category`,
     };
     setLoading(true);
     await axios(config)
@@ -85,6 +129,14 @@ const Onboarding = () => {
       });
     } else if (!selectedSubCat?._id) {
       toast.error("please select a sub category", {
+        position: "bottom-right",
+      });
+    } else if (selectedLanguages?.length === 0) {
+      toast.error("please select atleast one language", {
+        position: "bottom-right",
+      });
+    } else if (!maxBudget > 0) {
+      toast.error("provide your maximum budget.", {
         position: "bottom-right",
       });
     } else if (cord.length === 0) {
@@ -129,7 +181,7 @@ const Onboarding = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `https://api.test.festabash.com/v1/vendor-management/vendor/${id}?$populate=address.city&$populate=categories.category&$populate=categories.subCategories`,
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor/${id}?$populate=address.city&$populate=categories.category&$populate=categories.subCategories`,
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -167,7 +219,7 @@ const Onboarding = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result[0].link);
@@ -198,7 +250,7 @@ const Onboarding = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result.map((item) => item.link));
@@ -229,7 +281,7 @@ const Onboarding = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result.map((item) => item.link));
@@ -259,7 +311,7 @@ const Onboarding = () => {
       body: formdata,
       redirect: "follow",
     };
-    await fetch("https://api.test.festabash.com/v1/upload", requestOptions)
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}upload`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result[0].link);
@@ -338,6 +390,8 @@ const Onboarding = () => {
           link: businessProofUrl,
         },
       ],
+      languages: selectedLanguages,
+      maxBudget: maxBudget,
       attachments: attachmentsUrl,
       packages: packagesLinks,
       categories: [
@@ -360,7 +414,9 @@ const Onboarding = () => {
       address: {
         addressLine1: comAddress,
       },
-      coordinates: [25.8014, 85.478],
+      languages: selectedLanguages,
+      maxBudget: maxBudget,
+      coordinates: cord,
       businessProof: [
         {
           type: identityType,
@@ -388,7 +444,7 @@ const Onboarding = () => {
     var config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/vendor-management/vendor",
+      url: `${process.env.NEXT_PUBLIC_API_URL}vendor-management/vendor`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -441,7 +497,7 @@ const Onboarding = () => {
   }, []);
 
   return (
-    <div className="text-white min-h-screen bg-gray-900 flex justify-center items-center">
+    <div className="text-white h-full min-h-screen bg-gray-900 flex justify-center items-center">
       <div className="max-w-2xl w-full bg-pink-50 bg-opacity-5 p-4 rounded-xl border border-white">
         <div className="text-xl md:text-2xl font-semibold my-3">
           Create your profile
@@ -552,7 +608,7 @@ const Onboarding = () => {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute mt-2 w-full origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="z-50 absolute mt-2 w-full origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <div className="px-1 py-1 ">
                         {categories?.map((cat, index) => (
                           <Menu.Item
@@ -612,7 +668,7 @@ const Onboarding = () => {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute  mt-2 w-full px- origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="absolute z-50 mt-2 w-full px- origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <div className="px-1 py-1 ">
                         {selectedCat?.subCatgories?.map((cat, index) => (
                           <Menu.Item
@@ -640,7 +696,58 @@ const Onboarding = () => {
                 </Menu>
               </div>
             </div>
-
+            <div className="relative">
+              <button
+                type="button"
+                className="inline-flex justify-center items-center w-full px-4 py-2 text-sm font-medium text-white bg-transparent border border-gray-300 rounded-md shadow-sm "
+                onClick={handleDropdownClick}
+              >
+                <span>Languages</span>
+              </button>
+              {isOpen && (
+                <div className="z-50 origin-top-right  absolute right-0 mt-2 w-full max-w-sm rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                  <div className="py-1 grid grid-cols-2">
+                    {LANGUAGES.map((language) => (
+                      <label
+                        key={language}
+                        className="block px-4 py-px text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <input
+                          type="checkbox"
+                          value={language}
+                          checked={selectedLanguages.includes(language)}
+                          onChange={handleCheckboxChange}
+                          className="mr-2 leading-tight"
+                        />
+                        <span className="ml-2">{language}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="mt-2 flex space-x-2 flex-wrap">
+                {selectedLanguages?.map((language, index) => (
+                  <div
+                    className="px-2 py-1 rounded-md bg-gray-50 bg-opacity-20"
+                    key={language}
+                  >
+                    {language}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-white text-sm  mb-1">
+                Maximum Budget <span className="text-sm">*</span>
+              </div>
+              <input
+                type="number"
+                className="w-full py-2 border rounded-lg px-4 bg-transparent border-white"
+                value={maxBudget}
+                onChange={(e) => setMaxBudget(e.target.value)}
+                placeholder={"Enter your brand name"}
+              />
+            </div>
             <div className="m">
               <div className="text-white text-sm  mb-1">
                 Complete address <span className=" text-sm">*</span>

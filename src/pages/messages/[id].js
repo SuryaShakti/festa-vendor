@@ -1,6 +1,9 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { socketClient, socketApp } from "../_app";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ChatBox = () => {
   const router = useRouter();
@@ -13,7 +16,7 @@ const ChatBox = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `https://api.test.festabash.com/v1/chat/chat-message?$sort[createdAt]=1&$populate=createdBy&conversationVendor=${router?.query?.id}`,
+      url: `${process.env.NEXT_PUBLIC_API_URL}chat/chat-message?$sort[createdAt]=1&$populate=createdBy&conversationVendor=${router?.query?.id}`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -33,13 +36,13 @@ const ChatBox = () => {
     const token = localStorage.getItem("token");
 
     var data = JSON.stringify({
-      conversation: router?.query.id,
+      conversationVendor: router?.query.id,
       message: text,
     });
 
     var config = {
       method: "post",
-      url: "https://api.test.festabash.com/v1/chat/chat-message?$populate=createdBy",
+      url: `${process.env.NEXT_PUBLIC_API_URL}chat/chat-message?$populate=createdBy`,
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -66,6 +69,44 @@ const ChatBox = () => {
       fetchMessages();
     }
   }, [router.query.id]);
+
+  useEffect(() => {
+    console.log(socketClient);
+    if (messages?.length > 0) {
+      const token = localStorage.getItem("token");
+      socketClient.emit(
+        "create",
+        "authentication",
+        {
+          strategy: "jwt",
+          accessToken: token,
+        },
+        function (e, res) {
+          if (e) {
+            console.log(e);
+            toast.error(e.message ? e.message : "error", "bottom-right");
+          } else {
+            console.log(res);
+            console.log("Authenticated admin");
+
+            socketApp
+              .service("v1/chat/chat-message")
+              .on("created", (message) => {
+                console.log("******", message);
+                const _message = [...messages];
+                console.log(messages);
+                console.log([..._message, message]);
+                setMessages([..._message, message]);
+              });
+          }
+        }
+      );
+    }
+    // socketClient.on("connect", () => {
+
+    // });
+  }, [messages]);
+
   return (
     <div className="z-50">
       <div className="min-h-[95vh] flex flex-col py-4">
@@ -87,7 +128,7 @@ const ChatBox = () => {
                     src={message?.createdBy?.avatar}
                   ></img>
                 )}
-                <div className="ml-2 md:ml-4 max-w-[70%] md:max-w-[50%] p-3 text-xs md:text-sm bg-white rounded-bl-xl rounded-r-xl">
+                <div className="ml-2 my-1 md:ml-4 max-w-[70%] md:max-w-[50%] p-3 text-xs md:text-sm bg-white rounded-bl-xl rounded-r-xl">
                   {message?.message}
                 </div>
               </div>

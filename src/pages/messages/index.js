@@ -14,7 +14,7 @@ const messages = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/chat/conversation-vendor?$populate=users&$populate=lastMessage",
+      url: `${process.env.NEXT_PUBLIC_API_URL}chat/conversation-vendor?$populate=users&$populate=lastMessage`,
       headers: {
         Authorization: `Bearer ${token}`,
       },

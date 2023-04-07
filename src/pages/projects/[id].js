@@ -12,7 +12,7 @@ const ProjectDetails = () => {
     const token = localStorage.getItem("token");
     var config = {
       method: "get",
-      url: `https://api.test.festabash.com/v1/event-management/event/${router?.query?.id}`,
+      url: `${process.env.NEXT_PUBLIC_API_URL}event-management/event/${router?.query?.id}`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -33,7 +33,7 @@ const ProjectDetails = () => {
 
     var config = {
       method: "get",
-      url: `https://api.test.festabash.com/v1/sub-event-management/sub-event?event=${router?.query.id}`,
+      url: `${process.env.NEXT_PUBLIC_API_URL}sub-event-management/sub-event?event=${router?.query.id}`,
       headers: {
         Authorization: `Bearer ${token}`,
       },

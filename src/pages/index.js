@@ -48,7 +48,7 @@ const Home = () => {
 
     var config = {
       method: "post",
-      url: "https://api.test.festabash.com/v1/login/phone-login",
+      url: `${process.env.NEXT_PUBLIC_API_URL}login/phone-login`,
       headers: {
         "Content-Type": "application/json",
       },
@@ -90,7 +90,7 @@ const Home = () => {
     //   await sendOtp(operation);
     // } else {
     //   return;
-    // } 
+    // }
   };
 
   const verifyOtp = async (operation) => {
@@ -104,7 +104,7 @@ const Home = () => {
       setLoading(true);
       var config = {
         method: "patch",
-        url: "https://api.test.festabash.com/v1/login/phone-login",
+        url: `${process.env.NEXT_PUBLIC_API_URL}login/phone-login`,
         headers: {
           "Content-Type": "application/json",
         },
@@ -125,7 +125,7 @@ const Home = () => {
 
             var config2 = {
               method: "post",
-              url: "https://api.test.festabash.com/v1/user",
+              url: `${process.env.NEXT_PUBLIC_API_URL}user`,
               headers: {
                 "Content-Type": "application/json",
               },

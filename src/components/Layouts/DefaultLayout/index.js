@@ -42,6 +42,8 @@ const navigation = [
   { name: "Feedback", href: "/feedback", icon: ChartBarIcon, current: false },
   { name: "Support", href: "/support", icon: ChartBarIcon, current: false },
   { name: "Profile", href: "/profile", icon: ChartBarIcon, current: false },
+  { name: "Privacy Policy", href: "/privacy-policy", icon: ChartBarIcon, current: false },
+  { name: "Terms and Conditions", href: "/terms-conditions", icon: ChartBarIcon, current: false },
 ];
 
 function classNames(...classes) {
@@ -236,7 +238,7 @@ export default function DefaultLayout({ children }) {
               <div className="w-full mt-5">
                 <img src={"/images/logoFinal.png"} className="w-7/12 mx-auto" />
               </div>
-              <div className="flex-shrink-0 flex p-4 mt-8">
+              <div className="flex-shrink-0 flex p-4 mt-2">
                 <a href="#" className="flex-shrink-0 w-full group block">
                   <div className="flex items-center">
                     <div>
@@ -266,7 +268,7 @@ export default function DefaultLayout({ children }) {
                   </div>
                 </a>
               </div>
-              <nav className=" mt-5 flex-1 pl-2 space-y-1">
+              <nav className=" mt-2 flex-1 pl-2 space-y-1">
                 {navigation.map((item) => (
                   <a
                     key={item.name}

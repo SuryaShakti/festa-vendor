@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useState, useEffect,   } from "react";
+import React, { useState, useEffect } from "react";
 import Spinner from "../../components/Spinner";
 
 const SupportDetails = () => {
@@ -13,7 +13,7 @@ const SupportDetails = () => {
     var config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.test.festabash.com/v1/help-center/support-ticket/63fac2db873454cd8467c87d?$populate=event&$sort[createdAt]=-1",
+      url: `${process.env.NEXT_PUBLIC_API_URL}help-center/support-ticket/${router.query.id}?$populate=event&$sort[createdAt]=-1`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
