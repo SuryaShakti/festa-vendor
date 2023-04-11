@@ -84,10 +84,10 @@ const ChatBox = () => {
         function (e, res) {
           if (e) {
             console.log(e);
-            toast.error(e.message ? e.message : "error", "bottom-right");
+            // toast.error(e.message ? e.message : "error", "bottom-right");
           } else {
             console.log(res);
-            console.log("Authenticated admin");
+            console.log("Authenticated vendor");
 
             socketApp
               .service("v1/chat/chat-message")
